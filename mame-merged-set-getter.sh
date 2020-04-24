@@ -28,7 +28,7 @@ if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
-fi
+fi 2>/dev/null 
 
 echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  

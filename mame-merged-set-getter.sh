@@ -4,8 +4,7 @@
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/mame 
 #############################################################################
-set -x
-#DLPATH="https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip" #OLD .217 MERGED SET
+#set -x
 DLPATH="https://archive.org/download/MAME220RomsOnlyMerged"
 ROMDIR="/media/fat/_Arcade/mame"
 MRADIR="/media/fat/_Arcade"

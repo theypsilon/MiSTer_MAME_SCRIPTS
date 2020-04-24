@@ -3,7 +3,7 @@
 #A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your HBMAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for HBMAME files: ROMDIR=/path/to/hbmame 
-#############################################################################
+##############################################################################
 #set -x
 DLPATH="https://archive.org/download/hbmame0220"
 ROMDIR="/media/fat/_Arcade/hbmame"

@@ -38,7 +38,7 @@ echo ""
 echo "`find "${MRADIR}" -name \*.mra | wc -l` .mra files found."
 
 echo ""
-echo "Downloading ROM "${ROMDIR}"!!! - Be Patient!!!" 
+echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!" 
 echo ""
 
 

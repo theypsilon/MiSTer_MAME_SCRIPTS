@@ -35,7 +35,7 @@ echo ""
 do
   if [ `grep -c -Fx "${i}" /tmp/mame-merged-set-getter.sh` -gt 0 ] 
      then
-        wget -q -nc --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
+        wget -q -nc -t 3 --no-check-certificate --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
         if [ ! -s "$ROMDIR"/"$i" ] 
            then
               echo "" 

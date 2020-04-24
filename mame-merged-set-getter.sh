@@ -26,7 +26,8 @@ mkdir -p ${ROMDIR}
 
 if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
    then
-      echo \n"Using "${INIFILE}"" 
+      echo ""
+      echo "Using "${INIFILE}"" 
 fi
 
 echo ""

@@ -3,7 +3,12 @@ Simple scripts to automate downloading MAME and HBMAME files for MiSTer.
 
 Instuctions: 
 
-Download the update_mame-getter.ini and update_hbmame-getter.ini the  to the Scripts directory and run.
+Download the update_mame-getter.ini and update_hbmame-getter.ini the to the Scripts directory and run.
+
+* update_mame-getter.ini downloads MAME files
+
+* update_hbmame-getter.ini downloads HBMAME files
+
 
 Q: Can I set my own custom loactions for MRA and MAME files? 
 A: A /media/fat/Scripts/update_mame-getter.ini and /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME and HBMAME files and MRA files.

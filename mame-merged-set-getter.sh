@@ -1,6 +1,6 @@
 #!/bin/bash
 #Q: How does it work?
-#A: Run it like any other script. This script looks for .mra files in _Arcade and its recursive directories and tries to download the MAME merged set zip files listed in the .mra files. At the bottom of the script is a list of all the merged MAME roms for the .220 set. Only rom files with names that match this list will be downloaded.  
+#A: Run it like any other MiSTer update script. This script looks for .mra files in _Arcade and its recursive directories and tries to download the MAME merged set zip files listed in the .mra files. At the bottom of the script is a list of all the merged MAME roms for the .220 set. Only rom files with names that match this list will be downloaded.  
 # 
 #Q: Why should you use this script? 
 #A: Well you really shouldn't. It's for being bleeding edge when retrodriven has yet to update their files. I use this script download the mame zip after a new core/mra has been released.

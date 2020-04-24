@@ -13,7 +13,7 @@
 #
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
 #############################################################################
-#set -x
+set -x
 #DLPATH="https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip" #OLD .217 MERGED SET
 DLPATH="https://archive.org/download/MAME220RomsOnlyMerged"
 ROMDIR="/media/fat/_Arcade/mame"

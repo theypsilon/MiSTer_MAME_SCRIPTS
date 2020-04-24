@@ -9,7 +9,7 @@ Download the update_mame-getter.ini and update_hbmame-getter.ini the to the Scri
 
 * update_hbmame-getter.ini downloads HBMAME files
 
-These scripts look at what MRA files you have and download the merged roms set needed for them. 
+These scripts look at what MRA files you have and download the merged set roms needed for them. 
 
 These scripts DO NOT download any cores or mra files. 
 

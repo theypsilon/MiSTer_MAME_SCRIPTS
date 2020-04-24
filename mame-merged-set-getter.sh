@@ -1,42 +1,53 @@
 #!/bin/bash
-#Q: How does it work?
-#A: Run it like any other MiSTer update script. This script looks for .mra files in _Arcade and its recursive directories and tries to download the MAME merged set zip files listed in the .mra files. At the bottom of the script is a list of all the merged MAME roms for the .220 set. Only rom files with names that match this list will be downloaded.  
-# 
-#Q: Why should you use this script? 
-#A: Well you really shouldn't. It's for being bleeding edge when retrodriven has yet to update their files. I use this script download the mame zip after a new core/mra has been released.
-#
-#
-#Q:Will this script over write files I already have?
-#A:NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files.
-#
-#A Merged set contains all of the files for every Clone version of a Parent game.
-#
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
+#A /media/fat/Scripts/update_mame-getter.ini file may be used to set custom location for your MAME files and MRA files.
+#Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
+#Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/mame 
 #############################################################################
-#set -x
+set -x
 #DLPATH="https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip" #OLD .217 MERGED SET
 DLPATH="https://archive.org/download/MAME220RomsOnlyMerged"
 ROMDIR="/media/fat/_Arcade/mame"
-mkdir -p $ROMDIR
+MRADIR="/media/fat/_Arcade"
+INIFILE="/media/fat/Scripts/update_mame-getter.ini"
+
+###INI FILES VARS######
+if [ `grep -c "ROMDIR=" "${INIFILE}"` -gt 0 ] 
+   then
+      ROMDIR=`grep "ROMDIR" "${INIFILE}" | awk -F "=" '{print$2}'`
+fi 2>/dev/null 
+
+
+if [ `grep -c "MRADIR=" "${INIFILE}"` -gt 0 ] 
+   then
+      MRADIR=`grep "MRADIR=" "${INIFILE}" | awk -F "=" '{print$2}'`
+fi 2>/dev/null 
+
+mkdir -p ${ROMDIR}
+
+if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
+   then
+      echo "Using "${INIFILE}"" 
+fi
 
 echo ""
-echo "Finding all .mra files in /media/fat/_Arcade/ and in recursive directores."  
+echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 sleep 5
 
 echo ""
-echo "`find /media/fat/_Arcade -name \*.mra | wc -l` .mra files found."
+echo "`find "${MRADIR}" -name \*.mra | wc -l` .mra files found."
 
 echo ""
-echo "Downloading of Merged ROM SETS ONLY!!! - Be Patient!!!" 
+echo "Downloading ROM "${ROMDIR}"!!! - Be Patient!!!" 
 echo ""
 
 
- find /media/fat/_Arcade -name \*.mra -exec grep "zip=" {} \; | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | while read i 
+ find "${MRADIR}" -name \*.mra -exec grep "zip=" {} \; | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | while read i 
 do
   if [ `grep -c -Fx "${i}" /tmp/mame-merged-set-getter.sh` -gt 0 ] 
      then
-        wget -q -nc -t 3 --no-check-certificate --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
-        if [ ! -s "$ROMDIR"/"$i" ] 
+        wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
+        if [ ! -s "$ROMDIR"/"${i}" ] 
            then
               echo "" 
               echo "0 byte file found for $i!" 

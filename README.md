@@ -1,5 +1,5 @@
 # MiSTer_MAME_SCRIPTS
-Simple scripts to automate downloading MAME and HBMAME(Comming Soon) files for MiSTer.
+Simple scripts to automate downloading MAME and (HBMAME - Comming Soon) files for MiSTer.
 
 Instuctions: 
 

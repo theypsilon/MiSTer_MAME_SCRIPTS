@@ -3,7 +3,7 @@ Simple scripts to automate downloading MAME and HBMAME files for MiSTer based on
 
 Instuctions: 
 
-Download the update_mame-getter.ini and update_hbmame-getter.ini the to the Scripts directory and run.
+Download the update_mame-getter.sh and update_hbmame-getter.sh the to the Scripts directory and run.
 
 * update_mame-getter.sh downloads MAME files
 

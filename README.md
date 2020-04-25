@@ -22,7 +22,7 @@ Add the following line to the ini file to set a directory for HBMAME files: ROMD
 
 Q:Will this script over write files I already have?
 
-A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files. This also means that after you have the (HB)MAME files downloaded addtinal runs of the script will be much faster.
+A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files. This also means that after you have the HBMAME or MAME files downloaded additional runs of the script will be much faster.
 
 A Merged set contains all of the files for every Clone version of a Parent game.
 

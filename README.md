@@ -5,9 +5,9 @@ Instuctions:
 
 Download the update_mame-getter.ini and update_hbmame-getter.ini the to the Scripts directory and run.
 
-* update_mame-getter.ini downloads MAME files
+* update_mame-getter.sh downloads MAME files
 
-* update_hbmame-getter.ini downloads HBMAME files
+* update_hbmame-getter.sh downloads HBMAME files
 
 These scripts look at what MRA files you have and download the merged set roms needed for them. 
 

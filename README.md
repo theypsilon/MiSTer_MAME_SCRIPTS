@@ -14,7 +14,7 @@ These scripts look at what MRA files you have and download the merged set roms n
 These scripts DO NOT download any cores or mra files. 
 
 
-Q: Can I set my own custom loactions for MRA and MAME Directories? 
+Q: Can I set my own custom locations for MRA and MAME Directories? 
 
 A: A /media/fat/Scripts/update_mame-getter.ini and /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME and HBMAME files and MRA files.
 Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files

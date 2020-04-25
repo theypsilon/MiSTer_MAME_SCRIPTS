@@ -1,16 +1,19 @@
 #!/bin/bash
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
-#A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your HBMAME files and MRA files.
+#A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
-#Add the following line to the ini file to set a directory for HBMAME files: ROMDIR=/path/to/hbmame 
-##############################################################################
+#Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/hbmame 
+#############################################################################
 #set -x
-DLPATH="https://archive.org/download/hbmame0220"
+
+######VARS#####
+
 ROMDIR="/media/fat/_Arcade/hbmame"
 MRADIR="/media/fat/_Arcade"
 INIFILE="/media/fat/Scripts/update_hbmame-getter.ini"
 
-###INI FILES VARS######
+#####INI FILES VARS######
+
 if [ `grep -c "ROMDIR=" "${INIFILE}"` -gt 0 ] 
    then
       ROMDIR=`grep "ROMDIR" "${INIFILE}" | awk -F "=" '{print$2}'`
@@ -24,45 +27,103 @@ fi 2>/dev/null
 
 mkdir -p ${ROMDIR}
 
+#####INFO TXT#####
+
 if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
+      echo ""
 fi 2>/dev/null 
 
-echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
-sleep 5
-
 echo ""
-echo "`find "${MRADIR}" -name \*.mra | wc -l` .mra files found."
+echo ""
 
+echo "`find "${MRADIR}" -name \*.mra |  wc -l` .mra files found."
+echo ""
+echo "Skipping MAME files that already exist" 
 echo ""
 echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!" 
 echo ""
+sleep 5
 
+####FIND NEEDED ROMS FROM MRA FILES####
 
- find "${MRADIR}" -name \*.mra -exec grep "zip=" {} \; | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | while read i 
-do
-  if [ `grep -c -Fx "${i}" /tmp/hbmame-merged-set-getter.sh` -gt 0 ] 
-     then
-        wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
-        if [ ! -s "$ROMDIR"/"${i}" ] 
-           then
-              echo "" 
-              echo "0 byte file found for $i!" 
-              echo "This happens when the file is missing from the download source." 
-              #echo "This is a common when downloading from a source with MERGED rom sets." 
-              rm -v "${ROMDIR}"/"${i}"
-              echo ""
-         fi
-  fi
-done 
+find "${MRADIR}" -name \*.mra |  sort | while read i 
+do 
+
+  echo "${i}" > /tmp/hbmame.getter.mra.file
+
+grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/hbmame.getter.zip.file
+      
+  cat /tmp/hbmame.getter.zip.file | sed 's/\/hbmame\///g' | while read f
+  do
+
+   if [ $(grep -ic hbmame "`head -1 /tmp/hbmame.getter.mra.file`") -ge 1 ]
+      then
+  
+    if [ ! -f "${ROMDIR}/${f}" ]
+       then
+ 
+          if [ `grep -c -Fx "${f}" /tmp/hbmame-merged-set-getter.sh` -gt 0 ]
+             then
+
+                if [ x"${f}" != x ]
+                   then
+                      echo ""
+                      echo "MRA: `head -1 /tmp/hbmame.getter.mra.file`" 
+                      MRA=`head -1 /tmp/hbmame.getter.mra.file`
+                      echo "ZIP: "${f}"" 
+          
+                      if [ x$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
+                         then
+                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g')"
+                            VER=$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//')
+                      else
+                         #echo "Ver: version not in MRA"
+                         VER=XXX
+                      fi 
+
+#####DOWNLOAD#####
+
+                case "$VER" in
+                    #--hopfully will see more souces in the future. 
+                     *)
+                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/hbmame0220"/"${f}" 
+                            ;;
+                 esac               
+ 
+#####CLEAN UP######
+
+                      if [ ! -s "$ROMDIR"/"${f}" ]
+                         then
+                            echo ""
+                            echo "0 byte file found for "${f}"!"
+                            echo "This happens when the file is missing or unavalible from the download source."
+                            rm -v "${ROMDIR}"/"${f}"
+                            echo ""
+           fi
+
+        fi
+     fi  
+
+ fi 
+
+fi
+  done
+
+done
+
+rm /tmp/hbmame.getter.zip.file
+rm /tmp/hbmame.getter.mra.file
 
 echo ""
 echo "Finished Downloading!" 
 exit
 
+#####MERGED .220 LIST######
 ##HBMAME .220 LIST
 1942.zip
 1943.zip

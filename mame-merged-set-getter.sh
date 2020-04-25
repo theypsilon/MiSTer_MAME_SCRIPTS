@@ -5,12 +5,15 @@
 #Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/mame 
 #############################################################################
 #set -x
-DLPATH="https://archive.org/download/MAME220RomsOnlyMerged"
+
+######VARS#####
+
 ROMDIR="/media/fat/_Arcade/mame"
 MRADIR="/media/fat/_Arcade"
 INIFILE="/media/fat/Scripts/update_mame-getter.ini"
 
-###INI FILES VARS######
+#####INI FILES VARS######
+
 if [ `grep -c "ROMDIR=" "${INIFILE}"` -gt 0 ] 
    then
       ROMDIR=`grep "ROMDIR" "${INIFILE}" | awk -F "=" '{print$2}'`
@@ -24,46 +27,114 @@ fi 2>/dev/null
 
 mkdir -p ${ROMDIR}
 
+#####INFO TXT#####
+
 if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
+      echo ""
 fi 2>/dev/null 
 
-echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
-sleep 5
-
 echo ""
-echo "`find "${MRADIR}" -name \*.mra | wc -l` .mra files found."
-
+echo "Skipping .mra file that have \"_alternatives\" in their path (these are only for hbmame)"
+echo ""
+echo "`find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | wc -l` .mra files found."
+echo ""
+echo "Skipping MAME files that already exist" 
 echo ""
 echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!" 
 echo ""
+sleep 5
 
+####FIND NEEDED ROMS FROM MRA FILES####
 
- find "${MRADIR}" -name \*.mra -exec grep "zip=" {} \; | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | while read i 
-do
-  if [ `grep -c -Fx "${i}" /tmp/mame-merged-set-getter.sh` -gt 0 ] 
-     then
-        wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O "${ROMDIR}"/"${i}" "${DLPATH}"/"${i}"; 
-        if [ ! -s "$ROMDIR"/"${i}" ] 
-           then
-              echo "" 
-              echo "0 byte file found for $i!" 
-              echo "This happens when the file is missing from the download source." 
-              #echo "This is a common when downloading from a source with MERGED rom sets." 
-              rm -v "${ROMDIR}"/"${i}"
-              echo ""
-         fi
-  fi
-done 
+find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | sort | while read i 
+do 
+
+  echo "${i}" > /tmp/mame.getter.mra.file
+
+grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file
+      
+  cat /tmp/mame.getter.zip.file | while read f
+  do
+     
+    if [ ! -f "${ROMDIR}/${f}" ]
+       then
+ 
+          if [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ]
+             then
+
+                if [ x"${f}" != x ]
+                   then
+                      echo ""
+                      echo "MRA: `head -1 /tmp/mame.getter.mra.file`" 
+                      MRA=`head -1 /tmp/mame.getter.mra.file`
+                      echo "ZIP: "${f}"" 
+          
+                      if [ x$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
+                         then
+                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g')"
+                            VER=$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//')
+                      else
+                         #echo "Ver: version not in MRA"
+                         VER=XXX
+                      fi 
+
+#####DOWNLOAD#####
+
+                case "$VER" in
+                     
+		     '0209')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O "${ROMDIR}"/"${f}" "https://archive.org/download/MAME209RomsOnlyMerged"/"${f}" 
+                            ;;
+                     '0216')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" ""https://archive.org/download/MAME216RomsOnlyMerged/"${f}" 
+                            ;;
+                     '0217')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip"/"${f}" 
+                            ;;
+                     '0218')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME218RomsOnlyMerged/MAME%200.218%20ROMs%20%28merged%29.zip"/"${f}" 
+                            ;;
+                     '0219')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME219RomsOnlyMerged/MAME%200.219%20ROMs%20%28merged%29.zip"/"${f}" 
+                            ;;
+                     *)
+                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .217 set"
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip"/"${f}" 
+                            ;;
+                 esac               
+ 
+#####CLEAN UP######
+
+                      if [ ! -s "$ROMDIR"/"${f}" ]
+                         then
+                            echo ""
+                            echo "0 byte file found for "${f}"!"
+                            echo "This happens when the file is missing or unavalible from the download source."
+                            rm -v "${ROMDIR}"/"${f}"
+                            echo ""
+           fi
+
+        fi
+     fi  
+
+ fi 
+
+  done
+
+done
+
+rm /tmp/mame.getter.zip.file
+rm /tmp/mame.getter.mra.file
 
 echo ""
 echo "Finished Downloading!" 
 exit
 
-##MERGED .220 LIST
+#####MERGED .220 LIST######
 005.zip
 100lions.zip
 10yard.zip

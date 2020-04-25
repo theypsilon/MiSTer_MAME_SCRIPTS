@@ -1,5 +1,5 @@
 # MiSTer_MAME_SCRIPTS
-Simple scripts to automate downloading MAME and HBMAME files for MiSTer.
+Simple scripts to automate downloading MAME and HBMAME files for MiSTer based on you MRA files.
 
 Instuctions: 
 

@@ -26,4 +26,6 @@ A: NO, This script will not clober files you already have. You need to manaully 
 
 A Merged set contains all of the files for every Clone version of a Parent game.
 
+You should back up your HBMAME and MAME files before running this script.
+
 USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.

@@ -36,6 +36,7 @@ if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
       echo ""
 fi 2>/dev/null 
 
+echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
 #echo "Skipping all .mra file with '_alternatives' in their path (these are for hbmame)"

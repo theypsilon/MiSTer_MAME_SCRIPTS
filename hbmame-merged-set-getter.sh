@@ -36,10 +36,9 @@ if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
       echo ""
 fi 2>/dev/null 
 
+echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
-echo ""
-
 echo "`find "${MRADIR}" -name \*.mra |  wc -l` .mra files found."
 echo ""
 echo "Skipping MAME files that already exist" 

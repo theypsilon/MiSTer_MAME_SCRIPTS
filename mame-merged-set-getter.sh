@@ -38,9 +38,9 @@ fi 2>/dev/null
 
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
-echo "Skipping all .mra file with '_alternatives' in their path (these are for hbmame)"
-echo ""
-echo "`find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | wc -l` .mra files found."
+#echo "Skipping all .mra file with '_alternatives' in their path (these are for hbmame)"
+#echo ""
+echo "`find "${MRADIR}" -name \*.mra | wc -l` .mra files found."
 echo ""
 echo "Skipping MAME files that already exist" 
 echo ""
@@ -49,8 +49,8 @@ echo ""
 sleep 5
 
 ####FIND NEEDED ROMS FROM MRA FILES####
-
-find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | sort | while read i 
+#find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | sort | while read i
+find "${MRADIR}" -name \*.mra | sort | while read i 
 do 
 
   echo "${i}" > /tmp/mame.getter.mra.file

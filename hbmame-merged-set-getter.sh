@@ -55,7 +55,18 @@ do
 
   echo "${i}" > /tmp/hbmame.getter.mra.file
 
-grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/hbmame.getter.zip.file
+#find double quotes zip names
+grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file
+
+#find single quotes zip names
+grep ".zip=" "${i}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file2
+
+#put both files togther 
+cat /tmp/hbmame.getter.zip.file >> /tmp/hbmame.getter.zip.file2
+
+sort -u /tmp/hbmame.getter.zip.file2 > /tmp/hbmame.getter.zip.file
+
+rm /tmp/hbmame.getter.zip.file2
       
   cat /tmp/hbmame.getter.zip.file | sed 's/\/hbmame\///g' | while read f
   do

@@ -15,7 +15,7 @@
 #A Merged set contains all of the files for every Clone version of a Parent game.
 #
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
-##############################################################################
+###############################################################################
 
 echo "STARTING: MAME-GETTER"
 echo ""

@@ -4,7 +4,7 @@
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/mame 
 #############################################################################
-#set -x
+set -x
 
 ######VARS#####
 
@@ -38,8 +38,6 @@ fi 2>/dev/null
 
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
-echo "Skipping .mra file that have \"_alternatives\" in their path (these are only for hbmame)"
-echo ""
 echo "`find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | wc -l` .mra files found."
 echo ""
 echo "Skipping MAME files that already exist" 
@@ -50,17 +48,31 @@ sleep 5
 
 ####FIND NEEDED ROMS FROM MRA FILES####
 
-find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | sort | while read i 
+find "${MRADIR}" -name \*.mra | sort | while read i 
 do 
 
   echo "${i}" > /tmp/mame.getter.mra.file
 
+#find double quotes zip names 
 grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file
+
+#find sigle quotes zip names
+grep ".zip=" "${i}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file2
+
+#put both files togther 
+cat /tmp/mame.getter.zip.file >> /tmp/mame.getter.zip.file2
+
+sort -u /tmp/mame.getter.zip.file2 > /tmp/mame.getter.zip.file
+
+rm /tmp/mame.getter.zip.file2
       
   cat /tmp/mame.getter.zip.file | while read f
   do
-     
-    if [ ! -f "${ROMDIR}/${f}" ]
+    
+   if [ $(grep -ic hbmame "`head -1 /tmp/mame.getter.mra.file`") -eq 0 ]
+      then
+
+     if [ ! -f "${ROMDIR}/${f}" ]
        then
  
           if [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ]
@@ -120,11 +132,11 @@ grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".z
 
         fi
      fi  
-
- fi 
+  fi
+fi 
 
   done
-
+ 
 done
 
 rm /tmp/mame.getter.zip.file

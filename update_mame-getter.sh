@@ -29,3 +29,5 @@ chmod +x /tmp/mame-merged-set-getter.sh
 /tmp/mame-merged-set-getter.sh
 
 rm /tmp/mame-merged-set-getter.sh
+
+echo "FINISHED: MAME-GETTER"

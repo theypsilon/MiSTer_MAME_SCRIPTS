@@ -38,7 +38,7 @@ fi 2>/dev/null
 
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
-echo "Skipping all .mra file with \'_alternatives\' in their path (these are for hbmame)"
+echo "Skipping all .mra file with '_alternatives' in their path (these are for hbmame)"
 echo ""
 echo "`find "${MRADIR}" -name \*.mra | grep -v "_alternatives" | wc -l` .mra files found."
 echo ""

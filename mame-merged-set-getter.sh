@@ -4,7 +4,7 @@
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/mame 
 #############################################################################
-set -x
+#set -x
 
 ######VARS#####
 

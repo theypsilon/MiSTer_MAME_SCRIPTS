@@ -27,3 +27,5 @@ chmod +x /tmp/hbmame-merged-set-getter.sh
 /tmp/hbmame-merged-set-getter.sh
 
 rm /tmp/hbmame-merged-set-getter.sh
+
+echo "FINISHED: HBMAME-GETTER" 

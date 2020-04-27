@@ -139,7 +139,7 @@ rm /tmp/mame.getter.zip.file2
 fi 
 
   done
-exit
+  
 done
 
 rm /tmp/mame.getter.zip.file

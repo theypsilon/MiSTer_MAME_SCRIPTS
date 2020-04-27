@@ -99,6 +99,9 @@ rm /tmp/hbmame.getter.zip.file2
 
                 case "$VER" in
                     #--hopfully will see more souces in the future. 
+                  0217)
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/hbmame0217"/"${f}" 
+                            ;;
                      *)
                            echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
                            wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/hbmame0220"/"${f}" 

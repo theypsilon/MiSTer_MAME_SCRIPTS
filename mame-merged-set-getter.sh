@@ -151,39 +151,39 @@ echo ""
 
 ######MRA ROM CHECK#####
 
-#echo "STARTING: Checking MRA and MAME files!"
-#echo ""
-#echo "mra_rom_check by alanswx - https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh" 
-#echo ""
-#wget -q -nc -t 3 --output-file=/tmp/wget-log --show-progress -O /tmp/mra_rom_check.sh https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh
+echo "STARTING: Checking MRA and MAME files!"
+echo ""
+echo "mra_rom_check by alanswx - https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh" 
+echo ""
+wget -q -nc -t 3 --output-file=/tmp/wget-log --show-progress -O /tmp/mra_rom_check.sh https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh
 
-#chmod +x /tmp/mra_rom_check.sh
+chmod +x /tmp/mra_rom_check.sh
 
-#sleep 5
+sleep 5
 
-#/tmp/mra_rom_check.sh > /tmp/mra_rom_check.log
+/tmp/mra_rom_check.sh > /tmp/mra_rom_check.log
 
-#rm /tmp/mra_rom_check.sh
+rm /tmp/mra_rom_check.sh
 
 
-#if [ "`wc -l /tmp/mra_rom_check.log | awk '{print$1}'`" -ge 1 ]
-#   then
-#	echo ""
-#        echo "There are issues with one or more of your MRA or MAME files"
-#	echo ""
-#	echo "Please gently encourage Developers and Maintainers of MRA files to correct files with broken XML, missing CRC values and missing MAME versions values to correct their MRA files"
-#	echo ""
-#	echo "Confirm you have the most up to date version of the MRA file befor reporting issues" 
-#	echo ""
-#	echo "These issues generally do not prevent the game from being played and they likely indicate an incomplete MRA"
-#	echo ""
-#	echo "Further details can be seen in the log file found at /tmp/mra_rom_check.log" 
-#	echo ""
-#   else
-#        echo ""
-#        echo "No issues found with mra_rom_check!"
-#        echo ""
-#fi
+if [ "`wc -l /tmp/mra_rom_check.log | awk '{print$1}'`" -ge 1 ]
+   then
+	echo ""
+        echo "There are issues with one or more of your MRA or MAME files"
+	echo ""
+	echo "Please gently encourage Developers and Maintainers of MRA files to correct files with broken XML, missing CRC values and missing MAME versions values to correct their MRA files"
+	echo ""
+	echo "Confirm you have the most up to date version of the MRA file befor reporting issues" 
+	echo ""
+	echo "These issues generally do not prevent the game from being played and they likely indicate an incomplete MRA"
+	echo ""
+	echo "Further details can be seen in the log file found at /tmp/mra_rom_check.log" 
+	echo ""
+   else
+        echo ""
+        echo "No issues found with mra_rom_check!"
+        echo ""
+fi
 	exit
 
 #####MERGED .220 LIST######

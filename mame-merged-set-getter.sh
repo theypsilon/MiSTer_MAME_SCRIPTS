@@ -88,10 +88,10 @@ rm /tmp/mame.getter.zip.file2
                       MRA=`head -1 /tmp/mame.getter.mra.file`
                       echo "ZIP: "${f}"" 
           
-                      if [ x$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
+                      if [ x$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g'| head -1) != x ]
                          then
-                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g')"
-                            VER=$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//')
+                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | head -1)"
+                            VER=$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | head -1)
                       else
                          #echo "Ver: version not in MRA"
                          VER=XXX
@@ -139,7 +139,7 @@ rm /tmp/mame.getter.zip.file2
 fi 
 
   done
-  
+
 done
 
 rm /tmp/mame.getter.zip.file

@@ -11,7 +11,7 @@ Download the update_mame-getter.sh and update_hbmame-getter.sh the to the Script
 
 These scripts look at what MRA files you have and download the merged set roms needed for them. 
 
-These scripts DO NOT download any cores or mra files. 
+**These scripts DO NOT download any cores or mra files.** 
 
 
 Q: Can I set my own custom locations for MRA and MAME Directories? 

@@ -20,7 +20,7 @@
 echo "STARTING: MAME-GETTER"
 echo ""
 
-echo "Downloading the most resent mame-merged-set-getter script."
+echo "Downloading the most recent mame-merged-set-getter script."
 echo " "
 wget -q -t 3 --output-file=/tmp/wget-log --show-progress -O /tmp/mame-merged-set-getter.sh https://raw.githubusercontent.com/MAME-GETTER/MiSTer_MAME_SCRIPTS/master/mame-merged-set-getter.sh 
 

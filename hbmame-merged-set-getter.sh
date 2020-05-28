@@ -39,7 +39,7 @@ fi 2>/dev/null
 echo ""
 echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
 echo ""
-echo "`find "${MRADIR}" -name \*.mra |  wc -l` .mra files found."
+echo "`find "${MRADIR}" -name \*.mra | grep -v _Organized | wc -l` .mra files found."
 echo ""
 echo "Skipping HBMAME files that already exist" 
 echo ""

@@ -41,7 +41,7 @@ echo "Finding all .mra files in "${MRADIR}" and in recursive directores."
 echo ""
 echo "`find "${MRADIR}" -name \*.mra |  wc -l` .mra files found."
 echo ""
-echo "Skipping MAME files that already exist" 
+echo "Skipping HBMAME files that already exist" 
 echo ""
 echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!" 
 echo ""
@@ -49,7 +49,7 @@ sleep 5
 
 ####FIND NEEDED ROMS FROM MRA FILES####
 
-find "${MRADIR}" -name \*.mra |  sort | while read i 
+find "${MRADIR}" -name \*.mra | grep -v _Organized | sort | while read i 
 do 
 
   echo "${i}" > /tmp/hbmame.getter.mra.file
@@ -88,8 +88,8 @@ rm /tmp/hbmame.getter.zip.file2
           
                       if [ x$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
                          then
-                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g')"
-                            VER=$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//')
+                            VER=$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | sed 's/[a-zA-Z]//')
+                            echo $VER
                       else
                          #echo "Ver: version not in MRA"
                          VER=XXX
@@ -101,6 +101,13 @@ rm /tmp/hbmame.getter.zip.file2
                     #--hopfully will see more souces in the future. 
                   0217)
                            wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/hbmame0217"/"${f}" 
+                            ;;
+                  0220)
+                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/hbmame0220"/"${f}" 
+                            ;;
+                  0221)
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" ""https://archive.org/download/hbmame0221aroms/"${f}" 
                             ;;
                      *)
                            echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"

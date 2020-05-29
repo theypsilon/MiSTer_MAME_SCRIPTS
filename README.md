@@ -1,7 +1,7 @@
 # MiSTer_MAME_SCRIPTS
 Simple scripts to automate downloading MAME and HBMAME files for MiSTer based on your MRA files.
 
-Instuctions: 
+Instructions 
 
 Download the update_mame-getter.sh and update_hbmame-getter.sh the to the Scripts directory and run.
 

@@ -119,6 +119,9 @@ rm /tmp/mame.getter.zip.file2
 	             '0220')
                            wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME220RomsOnlyMerged"/"${f}" 
                             ;;
+	             '0221')
+                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME221RomsOnlyMerged"/"${f}" 
+                            ;;			    
                      *)
                            echo "MAME version not listed in MRA or there is no download source for the version, downloading from .217 set"
                            wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMDIR}"/"${f}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip"/"${f}" 

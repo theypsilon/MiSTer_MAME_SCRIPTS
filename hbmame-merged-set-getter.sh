@@ -3,7 +3,7 @@
 #A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMDIR=/path/to/hbmame 
-#############################################################################
+###############################################################################
 #set -x
 
 ######VARS#####
@@ -14,51 +14,44 @@ INIFILE="/media/fat/Scripts/update_hbmame-getter.ini"
 
 #####INI FILES VARS######
 
-if [ `grep -c "ROMDIR=" "${INIFILE}"` -gt 0 ] 
+INIFILE_FIXED=$(mktemp)
+if [[ -f "${INIFILE}" ]] ; then
+	dos2unix < "${INIFILE}" 2> /dev/null | grep -v "^exit" > ${INIFILE_FIXED}
+fi
+
+if [ `grep -c "ROMDIR=" "${INIFILE_FIXED}"` -gt 0 ]
    then
-      ROMDIR=`grep "ROMDIR" "${INIFILE}" | awk -F "=" '{print$2}'`
+      ROMDIR=`grep "ROMDIR" "${INIFILE_FIXED}" | awk -F "=" '{print$2}'`
 fi 2>/dev/null 
 
 
-if [ `grep -c "MRADIR=" "${INIFILE}"` -gt 0 ] 
+if [ `grep -c "MRADIR=" "${INIFILE_FIXED}"` -gt 0 ]
    then
-      MRADIR=`grep "MRADIR=" "${INIFILE}" | awk -F "=" '{print$2}'`
+      MRADIR=`grep "MRADIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}'`
 fi 2>/dev/null 
 
 mkdir -p ${ROMDIR}
 
 #####INFO TXT#####
 
-if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE}"` -gt 0 ]
+if [ `egrep -c "MRADIR|ROMDIR" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
       echo ""
 fi 2>/dev/null 
 
-echo ""
-echo "Finding all .mra files in "${MRADIR}" and in recursive directores."  
-echo ""
-echo "`find "${MRADIR}" -name \*.mra | grep -v _Organized | wc -l` .mra files found."
-echo ""
-echo "Skipping HBMAME files that already exist" 
-echo ""
-echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!" 
-echo ""
-sleep 5
+rm ${INIFILE_FIXED}
 
-####FIND NEEDED ROMS FROM MRA FILES####
+download_hbmame_roms_from_mra() {
+   local MRA_FILE="${1}"
+   echo "${MRA_FILE}" > /tmp/hbmame.getter.mra.file
 
-find "${MRADIR}" -name \*.mra | grep -v _Organized | sort | while read i 
-do 
+   #find double quotes zip names
+   grep ".zip=" "${MRA_FILE}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file
 
-  echo "${i}" > /tmp/hbmame.getter.mra.file
-
-#find double quotes zip names
-grep ".zip=" "${i}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file
-
-#find single quotes zip names
-grep ".zip=" "${i}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file2
+   #find single quotes zip names
+   grep ".zip=" "${MRA_FILE}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file2
 
 #put both files togther 
 cat /tmp/hbmame.getter.zip.file >> /tmp/hbmame.getter.zip.file2
@@ -133,8 +126,40 @@ rm /tmp/hbmame.getter.zip.file2
 
 fi
   done
+}
 
-done
+if [ ${#} -ge 1 ] ; then
+   echo ""
+   echo "${#} arguments provided, this script expect them to be valid .mra files."
+   echo ""
+   echo "Skipping HBMAME files that already exist"
+   echo ""
+   echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!"
+   echo ""
+   sleep 5
+   printf '%s\n' "$@" | grep -o ".*\.[mM][rR][aA]" | sort | while read i
+   do
+      download_hbmame_roms_from_mra "${i}"
+   done
+else
+   echo ""
+   echo "Finding all .mra files in "${MRADIR}" and in recursive directores."
+   echo ""
+   echo "`find "${MRADIR}" -name \*.mra | grep -v _Organized | wc -l` .mra files found."
+   echo ""
+   echo "Skipping HBMAME files that already exist"
+   echo ""
+   echo "Downloading ROMs to "${ROMDIR}" - Be Patient!!!"
+   echo ""
+   sleep 5
+
+   ####FIND NEEDED ROMS FROM MRA FILES####
+
+   find "${MRADIR}" -name \*.mra | grep -v _Organized | sort | while read i
+   do
+      download_hbmame_roms_from_mra "${i}"
+   done
+fi
 
 rm /tmp/hbmame.getter.zip.file
 rm /tmp/hbmame.getter.mra.file

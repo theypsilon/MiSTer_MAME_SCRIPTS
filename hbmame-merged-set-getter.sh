@@ -18,7 +18,7 @@ ROMHBMAME="/media/fat/games/hbmame"
 MRADIR="/media/fat/_Arcade"
 INIFILE="/media/fat/Scripts/update_hbmame-getter.ini"
 
-#####INI FILES VARS######
+#####INI FILES VARS#######
 
 INIFILE_FIXED=$(mktemp)
 if [[ -f "${INIFILE}" ]] ; then

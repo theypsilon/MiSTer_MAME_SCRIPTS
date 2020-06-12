@@ -8,7 +8,7 @@
 
 ######INFO#####
 
-	echo "INFO: AS of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame" 
+	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame" 
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/hbmame/"
 	echo "INFO: You may still set a custom ROMHBMAME path in update_mame-getter.ini if needed" 
 
@@ -181,7 +181,7 @@ rm /tmp/hbmame.getter.mra.file
 
 ######INFO#####
         echo ""
-	echo "INFO: AS of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame" 
+	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame" 
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/hbmame/"
 	echo "INFO: You may still set a custom ROMHBMAME path in update_mame-getter.ini if needed" 
 echo ""

@@ -18,7 +18,8 @@ Q: Can I set my own custom locations for MRA and MAME Directories?
 
 A: A /media/fat/Scripts/update_mame-getter.ini and /media/fat/Scripts/update_hbmame-getter.ini files may be used to set custom locations for your MAME and HBMAME files and MRA files.
 Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
-Add the following line to the ini file to set a directory for HBMAME files: ROMDIR=/path/to/(hb)mame
+Add the following line to the ini file to set a directory for MAME files: ROMMAME=/path/to/mame
+Add the following line to the ini file to set a directory for HBMAME files: ROMHBMAME=/path/to/hbmame
 
 Q:Will this script over write files I already have?
 

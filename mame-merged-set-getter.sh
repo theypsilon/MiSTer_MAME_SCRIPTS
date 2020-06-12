@@ -6,7 +6,8 @@
 ##################################################################################
 #set -x
 ######INFO#####
-
+ 	
+	echo ""
 	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame" 
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
 	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed" 
@@ -228,11 +229,12 @@ if [ "`wc -l /tmp/mra_rom_check.log | awk '{print$1}'`" -ge 1 ]
    else
         echo ""
         echo "No issues found with mra_rom_check!"
-        echo ""
+          
+ fi
+ 	echo ""
 	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame" 
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
-	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"  
- fi
+	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
 	exit
 
 #####MERGED .220 LIST######

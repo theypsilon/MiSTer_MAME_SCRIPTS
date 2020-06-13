@@ -3,7 +3,7 @@
 #A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMHBMAME=/path/to/hbmame
-################################################################################
+#################################################################################
 #set -x
 
 ######INFO#####
@@ -143,19 +143,29 @@ fi
   done
 }
 
-if [ ${#} -ge 1 ] ; then
+if [ ${#} -eq 2 ] && [ ${1} == "-i" ] ; then
+   MRA_INPUT="${2:-}"
+   if [ ! -f ${MRA_INPUT} ] ; then
+      echo "Option -i selected, but file '${MRA_INPUT}' does not exist."
+      echo "Usage: ./${0} -i file"
+      exit 1
+   fi
    echo ""
-   echo "${#} arguments provided, this script expect them to be valid .mra files."
+   echo "$(wc -l ${MRA_INPUT} | awk '{print $1}') arguments provided, this script expects them to be valid .mra files."
    echo ""
    echo "Skipping HBMAME files that already exist"
    echo ""
    echo "Downloading ROMs to "${ROMHBMAME}" - Be Patient!!!"
    echo ""
    sleep 5
-   printf '%s\n' "$@" | grep -o ".*\.[mM][rR][aA]" | sort | while read i
+   cat ${MRA_INPUT} | while read i
    do
       download_hbmame_roms_from_mra "${i}"
    done
+elif [ ${#} -ge 1 ] ; then
+   echo "Invalid arguments."
+   echo "Usage: ${0} -i file"
+   exit 1
 else
    echo ""
    echo "Finding all .mra files in "${MRADIR}" and in recursive directores."

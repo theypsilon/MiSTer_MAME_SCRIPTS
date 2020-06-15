@@ -145,11 +145,11 @@ fi
   done
 }
 
-if [ ${#} -eq 2 ] && [ ${1} == "-i" ] ; then
+if [ ${#} -eq 2 ] && [ ${1} == "--input-file" ] ; then
    MRA_INPUT="${2:-}"
    if [ ! -f ${MRA_INPUT} ] ; then
-      echo "Option -i selected, but file '${MRA_INPUT}' does not exist."
-      echo "Usage: ./${0} -i file"
+      echo "Option --input-file selected, but file '${MRA_INPUT}' does not exist."
+      echo "Usage: ./${0} --input-file file"
       exit 1
    fi
    echo ""
@@ -160,13 +160,16 @@ if [ ${#} -eq 2 ] && [ ${1} == "-i" ] ; then
    echo "Downloading ROMs to "${ROMHBMAME}" - Be Patient!!!"
    echo ""
    sleep 5
-   cat ${MRA_INPUT} | while read i
+   IFS=$'\n'
+   MRA_FROM_FILE=($(cat ${MRA_INPUT}))
+   unset IFS
+   printf '%s\n' "${MRA_FROM_FILE[@]}" | while read i
    do
       download_hbmame_roms_from_mra "${i}"
    done
 elif [ ${#} -ge 1 ] ; then
    echo "Invalid arguments."
-   echo "Usage: ${0} -i file"
+   echo "Usage: ./${0} --input-file file"
    exit 1
 else
    echo ""

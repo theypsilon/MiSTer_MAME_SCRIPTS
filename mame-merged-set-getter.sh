@@ -17,7 +17,7 @@
 ROMMAME="/media/fat/games/mame"
 MRADIR="/media/fat/_Arcade"
 INIFILE="/media/fat/Scripts/update_mame-getter.ini"
-
+EXITSTATUS=0
 #####INI FILES VARS######
 
 INIFILE_FIXED=$(mktemp)
@@ -143,6 +143,7 @@ rm /tmp/mame.getter.zip.file2
                             echo "This happens when the file is missing or unavalible from the download source."
                             rm -v "${ROMMAME}"/"${f}"
                             echo ""
+			    EXITSTATUS=1
            fi
 
         fi
@@ -247,7 +248,7 @@ if [ "`wc -l /tmp/mra_rom_check.log | awk '{print$1}'`" -ge 1 ]
 	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame" 
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
 	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
-	exit
+	exit ${EXITSTATUS}
 
 #####MERGED .220 LIST######
 005.zip

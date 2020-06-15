@@ -17,6 +17,7 @@
 ROMHBMAME="/media/fat/games/hbmame"
 MRADIR="/media/fat/_Arcade"
 INIFILE="/media/fat/Scripts/update_hbmame-getter.ini"
+EXITSTATUS=0
 
 #####INI FILES VARS#######
 
@@ -132,6 +133,7 @@ rm /tmp/hbmame.getter.zip.file2
                             echo "This happens when the file is missing or unavalible from the download source."
                             rm -v "${ROMHBMAME}"/"${f}"
                             echo ""
+			    EXITSTATUS=1
            fi
 
         fi
@@ -197,7 +199,7 @@ rm /tmp/hbmame.getter.mra.file
 	echo ""
 	echo "Finished Downloading!" 
 
-exit
+exit ${EXITSTATUS}
 
 #####MERGED .220 LIST######
 ##HBMAME .220 LIST

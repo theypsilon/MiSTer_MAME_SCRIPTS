@@ -3,7 +3,7 @@
 #A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMHBMAME=/path/to/hbmame
-##################################################################################
+###################################################################################
 #set -x
 
 ######INFO#####
@@ -59,6 +59,9 @@ fi 2>/dev/null
 
 rm ${INIFILE_FIXED}
 
+SSL_SECURITY_OPTION="--insecure"
+CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
+
 download_hbmame_roms_from_mra() {
    local MRA_FILE="${1}"
    echo "${MRA_FILE}" > /tmp/hbmame.getter.mra.file
@@ -69,80 +72,72 @@ download_hbmame_roms_from_mra() {
    #find single quotes zip names
    grep ".zip=" "${MRA_FILE}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip | sed 's/\/hbmame\///g' > /tmp/hbmame.getter.zip.file2
 
-#put both files togther 
-cat /tmp/hbmame.getter.zip.file >> /tmp/hbmame.getter.zip.file2
+   #put both files togther
+   cat /tmp/hbmame.getter.zip.file >> /tmp/hbmame.getter.zip.file2
 
-sort -u /tmp/hbmame.getter.zip.file2 > /tmp/hbmame.getter.zip.file
+   sort -u /tmp/hbmame.getter.zip.file2 > /tmp/hbmame.getter.zip.file
+   rm /tmp/hbmame.getter.zip.file2
 
-rm /tmp/hbmame.getter.zip.file2
-      
-  cat /tmp/hbmame.getter.zip.file | sed 's/\/hbmame\///g' | while read f
-  do
+   FIRST_ZIP="true"
 
-   if [ $(grep -ic hbmame "`head -1 /tmp/hbmame.getter.mra.file`") -ge 1 ]
+   cat /tmp/hbmame.getter.zip.file | sed 's/\/hbmame\///g' | while read f
+   do
+      ZIP_PATH="${ROMHBMAME}/${f}"
+      if [ ! -f "${ZIP_PATH}" ] && \
+      [ $(grep -ic hbmame "${MRA_FILE}") -ge 1 ] && \
+      [ `grep -c -Fx "${f}" /tmp/hbmame-merged-set-getter.sh` -gt 0 ] && \
+      [ x"${f}" != x ]
       then
-  
-    if [ ! -f "${ROMHBMAME}/${f}" ]
-       then
- 
-          if [ `grep -c -Fx "${f}" /tmp/hbmame-merged-set-getter.sh` -gt 0 ]
-             then
+         if [[ "${FIRST_ZIP}" == "true" ]] ; then
+            echo "MRA: ${MRA_FILE}"
+            FIRST_ZIP="false"
+         fi
+         echo -n "ZIP: ${f} "
 
-                if [ x"${f}" != x ]
-                   then
-                      echo ""
-                      echo "MRA: `head -1 /tmp/hbmame.getter.mra.file`" 
-                      MRA=`head -1 /tmp/hbmame.getter.mra.file`
-                      echo "ZIP: "${f}"" 
-          
-                      if [ x$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
-                         then
-                            VER=$(grep "mameversion" "`head -1 /tmp/hbmame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | sed 's/[a-zA-Z]//')
-                            echo $VER
-                      else
-                         #echo "Ver: version not in MRA"
-                         VER=XXX
-                      fi 
+         if [ x$(grep "mameversion" "${MRA_FILE}" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g') != x ]
+         then
+            VER=$(grep "mameversion" "${MRA_FILE}" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | sed 's/[a-zA-Z]//')
+            echo "(Ver ${VER})"
+         else
+            echo
+            #echo "Ver: version not in MRA"
+            VER=XXX
+         fi
 
-#####DOWNLOAD#####
+         #####DOWNLOAD#####
 
-                case "$VER" in
-                    #--hopfully will see more souces in the future. 
-                  0217)
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMHBMAME}"/"${f}" "https://archive.org/download/hbmame0217"/"${f}"
-                            ;;
-                  0220)
-                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMHBMAME}"/"${f}" "https://archive.org/download/hbmame0220"/"${f}"
-                            ;;
-                  0221)
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMHBMAME}"/"${f}" ""https://archive.org/download/hbmame0221aroms/"${f}"
-                            ;;
-                     *)
-                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMHBMAME}"/"${f}" "https://archive.org/download/hbmame0220"/"${f}"
-                            ;;
-                 esac               
- 
-#####CLEAN UP######
+         case "$VER" in
+            #--hopfully will see more souces in the future.
+            '0217')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0217/${f}"
+                     ;;
+            '0220')
+                  echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0220/${f}"
+                     ;;
+            '0221')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0221aroms/${f}"
+                     ;;
+            *)
+                  echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0220/${f}"
+                     ;;
+         esac
 
-                      if [ ! -s "$ROMHBMAME"/"${f}" ]
-                         then
-                            echo ""
-                            echo "0 byte file found for "${f}"!"
-                            echo "This happens when the file is missing or unavalible from the download source."
-                            rm -v "${ROMHBMAME}"/"${f}"
-                            echo ""
-			    EXITSTATUS=1
-           fi
+         #####CLEAN UP######
 
-        fi
-     fi  
+         if [ ! -s "$ROMHBMAME"/"${f}" ]
+         then
+            echo ""
+            echo "0 byte file found for "${f}"!"
+            echo "This happens when the file is missing or unavalible from the download source."
+            rm -v "${ROMHBMAME}"/"${f}"
+            EXITSTATUS=1
+         fi
 
- fi 
-
-fi
-  done
+         echo
+      fi
+   done
 }
 
 if [ ${#} -eq 2 ] && [ ${1} == "--input-file" ] ; then
@@ -196,11 +191,11 @@ rm /tmp/hbmame.getter.mra.file
 
 ######INFO#####
         echo ""
-	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame" 
+	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/hbmame"
         echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/hbmame/"
-	echo "INFO: You may still set a custom ROMHBMAME path in update_mame-getter.ini if needed" 
+	echo "INFO: You may still set a custom ROMHBMAME path in update_mame-getter.ini if needed"
 	echo ""
-	echo "Finished Downloading!" 
+	echo "Finished Downloading!"
 
 exit ${EXITSTATUS}
 

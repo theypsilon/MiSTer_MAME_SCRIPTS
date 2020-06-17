@@ -58,104 +58,99 @@ fi 2>/dev/null
 
 rm ${INIFILE_FIXED}
 
+SSL_SECURITY_OPTION="--insecure"
+CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
+
 download_mame_roms_from_mra() {
    local MRA_FILE="${1}"
-  echo "${MRA_FILE}" > /tmp/mame.getter.mra.file
+   echo "${MRA_FILE}" > /tmp/mame.getter.mra.file
 
-#find double quotes zip names 
-grep ".zip=" "${MRA_FILE}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file
+   #find double quotes zip names
+   grep ".zip=" "${MRA_FILE}" | sed 's/.*\(zip=".*\)\.zip.*/\1/' | awk -F '"' '{print$2".zip"}' | sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file
 
-#find sigle quotes zip names
-grep ".zip=" "${MRA_FILE}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file2
+   #find sigle quotes zip names
+   grep ".zip=" "${MRA_FILE}" | sed -n 's/^.*'\''\([^'\'']*\)'\''.*$/\1/p'| sed s/\|/\\n/g | sort -u | grep -v ^.zip > /tmp/mame.getter.zip.file2
 
-#put both files togther 
-cat /tmp/mame.getter.zip.file >> /tmp/mame.getter.zip.file2
+   #put both files togther
+   cat /tmp/mame.getter.zip.file >> /tmp/mame.getter.zip.file2
 
-sort -u /tmp/mame.getter.zip.file2 > /tmp/mame.getter.zip.file
+   sort -u /tmp/mame.getter.zip.file2 > /tmp/mame.getter.zip.file
+   rm /tmp/mame.getter.zip.file2
 
-rm /tmp/mame.getter.zip.file2
-      
-  cat /tmp/mame.getter.zip.file | while read f
-  do
-    
-   if [ $(grep -ic hbmame "`head -1 /tmp/mame.getter.mra.file`") -eq 0 ]
+   FIRST_ZIP="true"
+
+   cat /tmp/mame.getter.zip.file | while read f
+   do
+      ZIP_PATH="${ROMMAME}/${f}"
+      if [ ! -f "${ZIP_PATH}" ] && \
+      [ $(grep -ic hbmame "${MRA_FILE}") -eq 0 ] && \
+      [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ] && \
+      [ x"${f}" != x ]
       then
+         if [[ "${FIRST_ZIP}" == "true" ]] ; then
+            echo "MRA: ${MRA_FILE}"
+            FIRST_ZIP="false"
+         fi
+         echo -n "ZIP: ${f} "
 
-     if [ ! -f "${ROMMAME}/${f}" ]
-       then
- 
-          if [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ]
-             then
+         if [ x$(grep "mameversion" "${MRA_FILE}" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g'| head -1) != x ]
+         then
+            VER=$(grep "mameversion" "${MRA_FILE}" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | head -1)
+            echo "(Ver ${VER})"
+         else
+            echo
+            #echo "Ver: version not in MRA"
+            VER=XXX
+         fi
 
-                if [ x"${f}" != x ]
-                   then
-                      echo ""
-                      echo "MRA: `head -1 /tmp/mame.getter.mra.file`" 
-                      MRA=`head -1 /tmp/mame.getter.mra.file`
-                      echo "ZIP: "${f}"" 
-          
-                      if [ x$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g'| head -1) != x ]
-                         then
-                            echo "Ver: $(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | head -1)"
-                            VER=$(grep "mameversion" "`head -1 /tmp/mame.getter.mra.file`" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g' | sed -e 's/\r//' | head -1)
-                      else
-                         #echo "Ver: version not in MRA"
-                         VER=XXX
-                      fi 
+         #####DOWNLOAD#####
 
-#####DOWNLOAD#####
+         case "$VER" in
 
-                case "$VER" in
-                     
-		     '0209')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O "${ROMMAME}"/"${f}" "https://archive.org/download/MAME209RomsOnlyMerged"/"${f}"
-                            ;;
-                     '0216')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" ""https://archive.org/download/MAME216RomsOnlyMerged/"${f}"
-                            ;;
-                     '0217')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip"/"${f}"
-                            ;;
-                     '0218')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME218RomsOnlyMerged/MAME%200.218%20ROMs%20%28merged%29.zip"/"${f}"
-                            ;;
-                     '0219')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME219RomsOnlyMerged/MAME%200.219%20ROMs%20%28merged%29.zip"/"${f}"
-                            ;;
-	             '0220')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME220RomsOnlyMerged"/"${f}"
-                            ;;
-	             '0221')
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME221RomsOnlyMerged"/"${f}"
-                            ;;			    
-                     *)
-                           echo "MAME version not listed in MRA or there is no download source for the version, downloading from .217 set"
-                           wget -q -nc -t 3 --output-file=/tmp/wget-log --no-check-certificate --show-progress -O  "${ROMMAME}"/"${f}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip"/"${f}"
-                            ;;
-                 esac               
- 
-#####CLEAN UP######
+            '0209')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME209RomsOnlyMerged/${f}"
+                     ;;
+            '0216')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME216RomsOnlyMerged/${f}"
+                     ;;
+            '0217')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip/${f}"
+                     ;;
+            '0218')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME218RomsOnlyMerged/MAME%200.218%20ROMs%20%28merged%29.zip/${f}"
+                     ;;
+            '0219')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME219RomsOnlyMerged/MAME%200.219%20ROMs%20%28merged%29.zip/${f}"
+                     ;;
+            '0220')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME220RomsOnlyMerged/${f}"
+                     ;;
+            '0221')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME221RomsOnlyMerged/${f}"
+                     ;;
+            *)
+                  echo "MAME version not listed in MRA or there is no download source for the version, downloading from .217 set"
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/MAME217RomsOnlyMerged/MAME%200.217%20ROMs%20%28merged%29.zip/${f}"
+                     ;;
+         esac
 
-                      if [ ! -s "$ROMMAME"/"${f}" ]
-                         then
-                            echo ""
-                            echo "0 byte file found for "${f}"!"
-                            echo "This happens when the file is missing or unavalible from the download source."
-                            rm -v "${ROMMAME}"/"${f}"
-                            echo ""
-			    EXITSTATUS=1
-           fi
+         #####CLEAN UP######
 
-        fi
-     fi  
-  fi
-fi 
+         if [ ! -s "$ROMMAME"/"${f}" ]
+         then
+            echo ""
+            echo "0 byte file found for "${f}"!"
+            echo "This happens when the file is missing or unavalible from the download source."
+            rm -v "${ROMMAME}"/"${f}"
+            EXITSTATUS=1
+         fi
 
-  done
-
+         echo
+      fi
+   done
 }
 
-if [ ${#} -eq 2 ] && [ ${1} == "--input-file" ] ; then
+if [ ${#} -eq 2 ] && [ "${1}" == "--input-file" ] ; then
 
    MRA_INPUT="${2:-}"
    if [ ! -f ${MRA_INPUT} ] ; then
@@ -212,46 +207,11 @@ echo ""
 echo "Finished Downloading!" 
 echo ""
 
-######MRA ROM CHECK#####
-
-echo "STARTING: Checking MRA and MAME files!"
 echo ""
-echo "mra_rom_check by alanswx - https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh" 
-echo ""
-wget -q -nc -t 3 --output-file=/tmp/wget-log --show-progress -O /tmp/mra_rom_check.sh https://raw.githubusercontent.com/MiSTer-devel/Scripts_MiSTer/master/other_authors/mra_rom_check.sh
-
-chmod +x /tmp/mra_rom_check.sh
-
-sleep 5
-
-/tmp/mra_rom_check.sh > /tmp/mra_rom_check.log
-
-rm /tmp/mra_rom_check.sh
-
-
-if [ "`wc -l /tmp/mra_rom_check.log | awk '{print$1}'`" -ge 1 ]
-   then
-	echo ""
-        echo "There are issues with one or more of your MRA or MAME files"
-	echo ""
-	echo "Please gently encourage Developers and Maintainers of MRA files to correct files with broken XML, missing CRC values and missing MAME versions values to correct their MRA files"
-	echo ""
-	echo "Confirm you have the most up to date version of the MRA file befor reporting issues" 
-	echo ""
-	echo "These issues generally do not prevent the game from being played and they likely indicate an incomplete MRA"
-	echo ""
-	echo "Further details can be seen in the log file found at /tmp/mra_rom_check.log" 
-	echo ""
-   else
-        echo ""
-        echo "No issues found with mra_rom_check!"
-          
- fi
- 	echo ""
-	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame" 
-        echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
-	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
-	exit ${EXITSTATUS}
+echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame"
+      echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
+echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
+exit ${EXITSTATUS}
 
 #####MERGED .220 LIST######
 005.zip

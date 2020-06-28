@@ -132,6 +132,9 @@ download_hbmame_roms_from_mra() {
             '0221')
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0221aroms/${f}"
                      ;;
+            '0222')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0222roms${f}"
+                     ;;
             *)
                   echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0220/${f}"

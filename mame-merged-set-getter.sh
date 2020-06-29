@@ -239,6 +239,8 @@ exit ${EXITSTATUS}
 1941.zip
 1942.zip
 1943.zip
+1943j.zip
+1943u.zip
 1943kai.zip
 1943mii.zip
 1944.zip

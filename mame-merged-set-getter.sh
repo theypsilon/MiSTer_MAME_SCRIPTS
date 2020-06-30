@@ -152,11 +152,11 @@ download_mame_roms_from_mra() {
 
          if [ ! -s "$ROMMAME"/"${f}" ]
          then
+            EXITSTATUS=1
             echo ""
             echo "0 byte file found for "${f}"!"
             echo "This happens when the file is missing or unavalible from the download source."
             rm -v "${ROMMAME}"/"${f}"
-            EXITSTATUS=1
          fi
 
          echo
@@ -239,6 +239,8 @@ exit ${EXITSTATUS}
 1941.zip
 1942.zip
 1943.zip
+1943j.zip
+1943u.zip
 1943kai.zip
 1943mii.zip
 1944.zip

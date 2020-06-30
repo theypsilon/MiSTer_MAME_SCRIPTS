@@ -152,11 +152,11 @@ download_mame_roms_from_mra() {
 
          if [ ! -s "$ROMMAME"/"${f}" ]
          then
+            EXITSTATUS=1
             echo ""
             echo "0 byte file found for "${f}"!"
             echo "This happens when the file is missing or unavalible from the download source."
             rm -v "${ROMMAME}"/"${f}"
-            EXITSTATUS=1
          fi
 
          echo

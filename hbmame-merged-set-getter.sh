@@ -147,7 +147,7 @@ download_hbmame_roms_from_mra() {
          then
             echo ""
             echo "0 byte file found for "${f}"!"
-            echo "This happens when the file is missing or unavalible from the download source."
+            echo "This happens when the file is missing or unavailable from the download source."
             rm -v "${ROMHBMAME}"/"${f}"
             EXITSTATUS=1
          fi

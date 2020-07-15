@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
-#A /media/fat/Scripts/update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
+#A update_hbmame-getter.ini file may be used to set custom location for your MAME files and MRA files.
 #Add the following line to the ini file to set a directory for MRA files: MRADIR=/top/path/to/mra/files
 #Add the following line to the ini file to set a directory for MAME files: ROMHBMAME=/path/to/hbmame
 ###################################################################################
@@ -30,7 +30,11 @@
 
 ROMHBMAME="/media/fat/games/hbmame"
 MRADIR="/media/fat/_Arcade"
-INIFILE="/media/fat/Scripts/update_hbmame-getter.ini"
+INIFILE="$(pwd)/update_hbmame-getter.ini"
+
+CURL_RETRY="${CURL_RETRY:---connect-timeout 15 --max-time 180 --retry 3 --retry-delay 5 --show-error}"
+SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
+
 EXITSTATUS=0
 
 #####INI FILES VARS#######
@@ -58,13 +62,18 @@ fi 2>/dev/null
 if [ `grep -c "MRADIR=" "${INIFILE_FIXED}"` -gt 0 ]
    then
       MRADIR=`grep "MRADIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^ *"//' -e 's/" *$//'`
-fi 2>/dev/null 
+fi 2>/dev/null
+
+if [ `grep -c "CURL_RETRY=" "${INIFILE_FIXED}"` -gt 0 ]
+   then
+      CURL_RETRY=`grep "CURL_RETRY=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+fi 2>/dev/null
 
 mkdir -p ${ROMHBMAME}
 
 #####INFO TXT#####
 
-if [ `egrep -c "MRADIR|ROMHBMAME|ROMDIR" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "MRADIR|ROMHBMAME|ROMDIR|CURL_RETRY" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
@@ -72,9 +81,6 @@ if [ `egrep -c "MRADIR|ROMHBMAME|ROMDIR" "${INIFILE_FIXED}"` -gt 0 ]
 fi 2>/dev/null 
 
 rm ${INIFILE_FIXED}
-
-SSL_SECURITY_OPTION="--insecure"
-CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 
 download_hbmame_roms_from_mra() {
    local MRA_FILE="${1}"

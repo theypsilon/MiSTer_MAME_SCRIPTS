@@ -241,11 +241,12 @@ mame_getter_optimized() {
       FIND_ARGS+=(-not -ipath "${MRADIR}/_Organized/*")
    fi
 
-   local UPDATED_MRAS=$(mktemp)
-   local MRA_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
    if [[ "${FROM_SCRATCH}" == "false" ]] ; then
       FIND_ARGS+=(-newerct ${LAST_MRA_DATE})
    fi
+
+   local UPDATED_MRAS=$(mktemp)
+   local MRA_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
    find "${FIND_ARGS[@]}" | sort > ${UPDATED_MRAS}
 
@@ -280,6 +281,9 @@ mame_getter_optimized() {
    IFS=$'\n'
    MRA_FROM_FILE=($(cat ${UPDATED_MRAS}))
    unset IFS
+
+   rm "${UPDATED_MRAS}"
+
    for i in "${MRA_FROM_FILE[@]}" ; do
       download_mame_roms_from_mra "${i}"
    done

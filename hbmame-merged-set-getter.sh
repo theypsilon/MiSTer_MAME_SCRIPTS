@@ -97,7 +97,7 @@ if [[ "${INSTALL^^}" == "TRUE" ]] && [ ! -e "/media/fat/Scripts/update_hbmame-ge
    then
       echo "Downloading update_hbmame-getter.sh to /media/fat/Scripts"
       echo ""
-      curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_hbmame-getter.sh" https://raw.githubusercontent.com/MAME-GETTER/MiSTer_MAME_SCRIPTS/master/hbmame-merged-set-getter.sh || true
+      curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_hbmame-getter.sh" https://raw.githubusercontent.com/MAME-GETTER/MiSTer_MAME_SCRIPTS/master/update_hbmame-getter.sh || true
       echo
 fi
 

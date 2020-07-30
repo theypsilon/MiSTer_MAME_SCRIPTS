@@ -322,23 +322,7 @@ elif [ ${#} -ge 1 ] ; then
    echo "Usage: ./${0} --input-file file"
    exit 1
 else
-   echo ""
-   echo "Finding all .mra files in "${MRADIR}" and in recursive directores."
-   echo ""
-   echo "`find "${MRADIR}" -name \*.mra | grep -v _Organized | wc -l` .mra files found."
-   echo ""
-   echo "Skipping HBMAME files that already exist"
-   echo ""
-   echo "Downloading ROMs to "${ROMHBMAME}" - Be Patient!!!"
-   echo ""
-   sleep 5
-
-   ####FIND NEEDED ROMS FROM MRA FILES####
-
-   find "${MRADIR}" -name \*.mra | grep -v _Organized | sort | while read i
-   do
-      download_hbmame_roms_from_mra "${i}"
-   done
+   hbmame_getter_optimized
 fi
 
 rm /tmp/hbmame.getter.zip.file

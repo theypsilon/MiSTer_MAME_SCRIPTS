@@ -20,16 +20,18 @@
 #####################################################################################
 #set -x
 ######INFO#####
- 	
-	echo ""
-	echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame" 
-        echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
-	echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed" 
-        sleep 5
+if [ -d "/media/fat/_Arcade/mame" ] ; then
+   echo
+   echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame"
+   echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
+   echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
+   sleep 5
+fi
 ######VARS#####
 
 ROMMAME="/media/fat/games/mame"
 MRADIR="/media/fat/_Arcade"
+INSTALL="false"
 INIFILE="$(pwd)/update_mame-getter.ini"
 
 CURL_RETRY="${CURL_RETRY:---connect-timeout 15 --max-time 180 --retry 3 --retry-delay 5 --show-error}"
@@ -42,7 +44,6 @@ INIFILE_FIXED=$(mktemp)
 if [[ -f "${INIFILE}" ]] ; then
 	dos2unix < "${INIFILE}" 2> /dev/null > ${INIFILE_FIXED}
 fi
-
 
 # Warning! ROMDIR is deprecated in favor of ROMMAME. Don't use it!
 if [ `grep -c "ROMDIR=" "${INIFILE_FIXED}"` -gt 0 ]
@@ -61,7 +62,12 @@ fi 2>/dev/null
 if [ `grep -c "MRADIR=" "${INIFILE_FIXED}"` -gt 0 ]
    then
       MRADIR=`grep "MRADIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
-fi 2>/dev/null 
+fi 2>/dev/null
+
+if [ `grep -c "INSTALL=" "${INIFILE_FIXED}"` -gt 0 ]
+   then
+      INSTALL=`grep "INSTALL=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^ *"//' -e 's/" *$//'`
+fi 2>/dev/null
 
 if [ `grep -c "CURL_RETRY=" "${INIFILE_FIXED}"` -gt 0 ]
    then
@@ -72,7 +78,7 @@ mkdir -p ${ROMMAME}
 
 #####INFO TXT#####
 
-if [ `egrep -c "MRADIR|ROMMAME|ROMDIR|CURL_RETRY" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "MRADIR|ROMMAME|ROMDIR|INSTALL|CURL_RETRY" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
@@ -80,6 +86,17 @@ if [ `egrep -c "MRADIR|ROMMAME|ROMDIR|CURL_RETRY" "${INIFILE_FIXED}"` -gt 0 ]
 fi 2>/dev/null 
 
 rm ${INIFILE_FIXED}
+
+###############################
+MAME_GETTER_VERSION="1.0"
+#########Auto Install##########
+if [[ "${INSTALL^^}" == "TRUE" ]] && [ ! -e "/media/fat/Scripts/update_mame-getter.sh" ]
+   then
+      echo "Downloading update_mame-getter.sh to /media/fat/Scripts"
+      echo ""
+      curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_mame-getter.sh" https://raw.githubusercontent.com/MAME-GETTER/MiSTer_MAME_SCRIPTS/master/update_mame-getter.sh || true
+      echo
+fi
 
 download_mame_roms_from_mra() {
    local MRA_FILE="${1}"
@@ -170,6 +187,112 @@ download_mame_roms_from_mra() {
    done
 }
 
+mame_getter_optimized() {
+   local WORK_PATH="/media/fat/Scripts/.cache/mame-getter"
+   mkdir -p "${WORK_PATH}"
+
+   local INI_DATE=
+   if [ -f "${INIFILE}" ] ; then
+      INI_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ" -d "$(stat -c %y "${INIFILE}" 2> /dev/null)")
+   fi
+
+   local LAST_RUN_PATH="${WORK_PATH}/last_run"
+
+   local LAST_INI_DATE=
+   local LAST_MRA_DATE=
+   if [ -f "${LAST_RUN_PATH}" ] ; then
+      LAST_INI_DATE=$(cat "${LAST_RUN_PATH}" | sed '2q;d')
+      LAST_MRA_DATE=$(cat "${LAST_RUN_PATH}" | sed '3q;d')
+   fi
+
+   echo
+   local FROM_SCRATCH="false"
+   if [ ! -d "${ROMMAME}/" ] || \
+      (( $(du -s "${ROMMAME}/" | awk '{print $1}') < 10000 ))
+   then
+      FROM_SCRATCH="true"
+      echo "Inexistent or small rom folder detected."
+      echo
+   fi
+
+   if [[ "${LAST_MRA_DATE}" =~ ^[[:space:]]*$ ]] || \
+      ! date -d "${LAST_MRA_DATE}" > /dev/null 2>&1
+   then
+      FROM_SCRATCH="true"
+      echo "No previous runs detected."
+      echo
+   fi
+
+   if [[ "${INI_DATE}" != "${LAST_INI_DATE}" ]] ; then
+      FROM_SCRATCH="true"
+      echo "INI file has been modified."
+      echo
+   fi
+
+   local ORGDIR_FOLDERS="${WORK_PATH}/../arcade-organizer/orgdir-folders"
+
+   FIND_ARGS=()
+   FIND_ARGS+=("${MRADIR}" \( ! -iname \*HBMame.mra \) -iname \*.mra)
+   if [ -s "${ORGDIR_FOLDERS}" ] ; then
+      while IFS="" read -r p || [ -n "${p}" ] ; do
+         FIND_ARGS+=(-not -ipath "${p}/*")
+      done < "${ORGDIR_FOLDERS}"
+   else
+      FIND_ARGS+=(-not -ipath "${MRADIR}/_Organized/*")
+   fi
+
+   if [[ "${FROM_SCRATCH}" == "false" ]] ; then
+      FIND_ARGS+=(-newerct ${LAST_MRA_DATE})
+   fi
+
+   local UPDATED_MRAS=$(mktemp)
+   local MRA_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+   find "${FIND_ARGS[@]}" | sort > ${UPDATED_MRAS}
+
+   local TOTAL_MRAS="$(wc -l ${UPDATED_MRAS} | awk '{print $1}')"
+   if [[ "${FROM_SCRATCH}" == "true" ]] ; then
+      echo "Performing a full update."
+      echo
+      echo "Finding all .mra files in "${MRADIR}" and in recursive directores."
+      echo ""
+      echo "${TOTAL_MRAS} .mra files found in total."
+   else
+      if [ ${TOTAL_MRAS} -eq 0 ] ; then
+         echo "No new MRAs with MAME roms detected"
+         echo
+         echo "Skipping MAME Getter..."
+         echo
+         exit 0
+      fi
+      echo "Performing an incremental update."
+      echo "NOTE: Remove following file if you wish to force a full update."
+      echo " - ${LAST_RUN_PATH}"
+      echo
+      echo "Found ${TOTAL_MRAS} new MRAs that may require new roms."
+   fi
+   echo
+   echo "Skipping MAME files that already exist"
+   echo
+   echo "Downloading ROMs to "${ROMMAME}" - Be Patient!!!"
+   echo
+   sleep 5
+
+   IFS=$'\n'
+   MRA_FROM_FILE=($(cat ${UPDATED_MRAS}))
+   unset IFS
+
+   rm "${UPDATED_MRAS}"
+
+   for i in "${MRA_FROM_FILE[@]}" ; do
+      download_mame_roms_from_mra "${i}"
+   done
+
+   echo "${MAME_GETTER_VERSION}" > "${LAST_RUN_PATH}"
+   echo "${INI_DATE}" >> "${LAST_RUN_PATH}"
+   echo "${MRA_DATE}" >> "${LAST_RUN_PATH}"
+}
+
 if [ ${#} -eq 2 ] && [ "${1}" == "--input-file" ] ; then
 
    MRA_INPUT="${2:-}"
@@ -194,6 +317,13 @@ if [ ${#} -eq 2 ] && [ "${1}" == "--input-file" ] ; then
    do
       download_mame_roms_from_mra "${i}"
    done
+elif [ ${#} -eq 1 ] && [ ${1} == "--optimized" ] ; then
+   mame_getter_optimized
+elif [ ${#} -eq 1 ] && [ ${1} == "--print-ini-options" ] ; then
+   echo MRADIR=\""${MRADIR}\""
+   echo ROMMAME=\""${ROMMAME}\""
+   echo INSTALL=\""${INSTALL}\""
+   exit 0
 elif [ ${#} -ge 1 ] ; then
    echo "Invalid arguments."
    echo "Usage: ./${0} --input-file file"
@@ -223,14 +353,18 @@ fi
 rm /tmp/mame.getter.zip.file
 rm /tmp/mame.getter.mra.file
 
-echo ""
-echo "Finished Downloading!" 
-echo ""
+echo
+echo "SUCCESS!"
+echo
 
-echo ""
-echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame"
-      echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
-echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
+######INFO#####
+if [ -d "/media/fat/_Arcade/mame" ] ; then
+   echo
+   echo "INFO: As of 6/11/2020 the default directory has been changed to /media/fat/games/mame"
+   echo "INFO: Please move all roms from /media/fat/_Arcade/mame/* to /media/fat/games/mame/"
+   echo "INFO: You may still set a custom ROMMAME path in update_mame-getter.ini if needed"
+fi
+
 exit ${EXITSTATUS}
 
 #####MERGED .220 LIST######

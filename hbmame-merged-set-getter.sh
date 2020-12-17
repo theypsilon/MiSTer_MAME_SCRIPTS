@@ -162,7 +162,10 @@ download_hbmame_roms_from_mra() {
                      ;;
 	    '0224')
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0224roms/${f}"
-                     ;;	     
+                     ;;	
+	    'sfacps15hack')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/sfz.hack/${f}"
+                     ;;	
             *)
                   echo "MAME version not listed in MRA or there is no download source for the version, downloading from .220 set"
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0220/${f}"
@@ -977,3 +980,4 @@ zap.zip
 zeroteam.zip
 zintrckb.zip
 zupapa.zip
+sfzch_cps15.zip

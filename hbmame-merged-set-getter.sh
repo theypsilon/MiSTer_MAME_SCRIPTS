@@ -162,6 +162,12 @@ download_hbmame_roms_from_mra() {
 	    '0224')
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/hbmame0224roms/${f}"
                      ;;	
+	    '0226')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/HBmame0.226-romsmerged/${f}"
+                     ;;
+	    '0227')
+                  curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/HBmame0.227-romsmerged/${f}"
+                     ;;
 	    'facps15hack')
                   curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://archive.org/download/sfz.hack/${f}"
                      ;;	

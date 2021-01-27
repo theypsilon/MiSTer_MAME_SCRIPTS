@@ -125,7 +125,7 @@ download_mame_roms_from_mra() {
       ZIP_PATH="${ROMMAME}/${f}"
       if [ ! -f "${ZIP_PATH}" ] && \
       [ $(grep -ic hbmame "${MRA_FILE}") -eq 0 ] && \
-      [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ] && \
+      { ${DECRYPT_ROMS[${f}]:-false} || [ `grep -c -Fx "${f}" /tmp/mame-merged-set-getter.sh` -gt 0 ]; } && \
       [ x"${f}" != x ]
       then
          if [[ "${FIRST_ZIP}" == "true" ]] ; then
@@ -133,8 +133,8 @@ download_mame_roms_from_mra() {
             FIRST_ZIP="false"
          fi
          echo -n "ZIP: ${f} "
-	 
-	 # CPS2
+
+         # CPS2
          if ${DECRYPT_ROMS[${f}]:-false} ; then
             curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://cps2.avalaunch.net/downloads/${f}"
          else

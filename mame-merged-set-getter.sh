@@ -133,6 +133,11 @@ download_mame_roms_from_mra() {
             FIRST_ZIP="false"
          fi
          echo -n "ZIP: ${f} "
+	 
+	 # CPS2
+         if ${DECRYPT_ROMS[${f}]:-false} ; then
+            curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://cps2.avalaunch.net/downloads/${f}"
+         else
 
          if [ x$(grep "mameversion" "${MRA_FILE}" | sed 's/<mameversion>//' | sed 's/<\/mameversion>//'| sed 's/[[:blank:]]//g'| head -1) != x ]
          then
@@ -145,11 +150,6 @@ download_mame_roms_from_mra() {
          fi
 
          #####DOWNLOAD#####
-
-         # CPS2
-         if ${DECRYPT_ROMS[${f}]:-false} ; then
-            curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${ZIP_PATH}" "https://cps2.avalaunch.net/downloads/${f}"
-         else
 
          case "$VER" in
 
